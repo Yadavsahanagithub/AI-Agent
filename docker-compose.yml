@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"  # Orchestrator
+      - "8001:8001"  # API Agent
+      - "8005:8005"  # Language Agent
+      - "8006:8006"  # Voice Agent
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ALPHA_VANTAGE_API_KEY=${ALPHA_VANTAGE_API_KEY}
+    volumes:
+      - ./backend:/app/backend
+      - ./audio:/app/audio
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./app:/app/app
+      - ./public:/app/public
+    depends_on:
+      - backend
